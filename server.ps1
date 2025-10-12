@@ -27,6 +27,12 @@ while ($true) {
     '.jpg'  { $ctx.Response.ContentType = 'image/jpeg' }
     '.jpeg' { $ctx.Response.ContentType = 'image/jpeg' }
     '.svg'  { $ctx.Response.ContentType = 'image/svg+xml' }
+    '.webp' { $ctx.Response.ContentType = 'image/webp' }
+    '.mp4'  { $ctx.Response.ContentType = 'video/mp4' }
+    '.webm' { $ctx.Response.ContentType = 'video/webm' }
+    '.ogv'  { $ctx.Response.ContentType = 'video/ogg' }
+    '.mp3'  { $ctx.Response.ContentType = 'audio/mpeg' }
+    '.wav'  { $ctx.Response.ContentType = 'audio/wav' }
     default { $ctx.Response.ContentType = 'application/octet-stream' }
   }
 

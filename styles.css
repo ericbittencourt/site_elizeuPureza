@@ -294,7 +294,7 @@ img, video {
 .footer .container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 .portfolio-link { color: var(--muted); }
 .portfolio-link:hover { color: var(--accent); }
