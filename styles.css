@@ -126,12 +126,15 @@ img, video {
 .hero-subtitle {
   margin-top: 6px; /* mais perto do nome */
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* frase em linha */
   align-items: center; /* centralizado ao meio */
-  gap: 4px;
+  gap: 10px;
   font-family: 'Montserrat', sans-serif;
   text-transform: uppercase;
   color: var(--text);
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: transform, opacity;
 }
 .hero-subtitle .role {
   letter-spacing: 3px;
@@ -139,14 +142,16 @@ img, video {
   font-size: clamp(14px, 2.6vw, 22px);
   line-height: 1;
 }
-.hero-subtitle .role-photographer {
-  opacity: 0;
-  transform: translateY(16px);
-  animation: riseUp .7s ease-out .2s forwards; /* surge subindo */
-}
+.hero-subtitle .role-photographer,
 .hero-subtitle .role-filmmaker {
-  opacity: 0;
-  animation: fadeIn .6s ease .4s forwards;
+  opacity: 1;
+  transform: none;
+}
+/* Disparar subida da frase toda */
+.hero-subtitle.is-rise { animation: riseUpSubtitle .8s ease-out forwards; }
+@keyframes riseUpSubtitle {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .typing {
   font-family: 'Montserrat', sans-serif;

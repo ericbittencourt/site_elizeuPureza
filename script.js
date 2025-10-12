@@ -46,22 +46,36 @@ document.addEventListener('DOMContentLoaded', () => {
   prepareLocalVideos();
 });
 
-// Efeito de digitação no HERO
+// Efeito de digitação no HERO (inicia após o preloader sumir)
 (function typeWriter() {
   const el = document.getElementById('typing-text');
   if (!el) return;
   const text = 'Elizeu Pureza';
-  el.textContent = '';
-  let i = 0;
   const speed = 120;
-  function step() {
-    el.textContent = text.slice(0, i);
-    i++;
-    if (i <= text.length) {
-      setTimeout(step, speed);
+
+  const start = () => {
+    el.textContent = '';
+    let i = 0;
+    function step() {
+      el.textContent = text.slice(0, i);
+      i++;
+      if (i <= text.length) {
+        setTimeout(step, speed);
+      } else {
+        const subtitle = document.querySelector('.hero-subtitle');
+        if (subtitle) subtitle.classList.add('is-rise');
+      }
     }
+    step();
+  };
+
+  const pre = document.getElementById('preloader');
+  if (pre) {
+    // preloader remove em ~1200ms; iniciar logo após
+    setTimeout(start, 1300);
+  } else {
+    start();
   }
-  step();
 })();
 
 // Animar entrada suave com IntersectionObserver
