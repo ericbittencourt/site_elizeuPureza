@@ -48,11 +48,13 @@ img, video {
   position: relative;
   min-height: 100vh;
   padding: 64px 0;
+  z-index: 1; /* conteúdo acima do background fixo */
 }
 .section .overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+  z-index: 1; /* overlay acima do vídeo fixo */
 }
 .section-title {
   font-family: 'Montserrat', sans-serif;
@@ -75,6 +77,41 @@ img, video {
   height: 100%;
   object-fit: cover;
 }
+
+/* Efeito: vídeos fixos no viewport, seções rolam por cima */
+.hero .bg-video { /* hero video como background fixo */
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+.services .media-bg, .testimonials .media-bg, .contact .media-bg { /* contêiner de vídeo das seções como fixo */
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+.services .media-bg .bg-video, .testimonials .media-bg .bg-video, .contact .media-bg .bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mostrar o vídeo da seção ativa */
+.hero.is-active .bg-video { opacity: 1; visibility: visible; }
+.services.is-active .media-bg, .testimonials.is-active .media-bg, .contact.is-active .media-bg { opacity: 1; visibility: visible; }
 
 /* HERO */
 .hero { padding: 0; }

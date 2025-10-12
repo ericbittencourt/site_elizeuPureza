@@ -48,15 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Efeito de digitação no HERO
 (function typeWriter() {
-  const text = 'Elizeu Pureza';
   const el = document.getElementById('typing-text');
+  if (!el) return;
+  const text = 'Elizeu Pureza';
+  el.textContent = '';
   let i = 0;
+  const speed = 120;
   function step() {
-    if (!el) return;
-    el.textContent = text.substring(0, i);
+    el.textContent = text.slice(0, i);
     i++;
     if (i <= text.length) {
-      setTimeout(step, 120);
+      setTimeout(step, speed);
     }
   }
   step();
@@ -76,6 +78,46 @@ const observer = new IntersectionObserver(
 );
 
 document.querySelectorAll('[data-animate]').forEach((el) => observer.observe(el));
+
+// Seção ativa para fundos fixos: mostra o vídeo da seção visível
+(function activateFixedBackgrounds(){
+  const sections = Array.from(document.querySelectorAll('#hero, #portfolio, #sobre, #servicos, #depoimentos, #contato'));
+  if (!sections.length) return;
+
+  const setActive = (active) => {
+    sections.forEach((s) => s.classList.toggle('is-active', s === active));
+  };
+
+  const pickByCenter = () => {
+    const viewportCenter = window.innerHeight / 2;
+    let best = sections[0];
+    let bestDist = Infinity;
+    sections.forEach((s) => {
+      const r = s.getBoundingClientRect();
+      const center = r.top + r.height / 2;
+      const dist = Math.abs(center - viewportCenter);
+      if (dist < bestDist) { bestDist = dist; best = s; }
+    });
+    setActive(best);
+  };
+
+  // Inicializa pelo centro do viewport
+  pickByCenter();
+
+  // Atualiza de forma suave ao rolar/redimensionar
+  let ticking = false;
+  const onScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        pickByCenter();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+})();
 
 // Parallax suave em vídeos de fundo
 function updateParallax() {
