@@ -1,0 +1,215 @@
+/* Paleta e base */
+:root {
+  --bg: #000000;
+  --text: #ffffff;
+  --accent: #ffd200; /* amarelo vibrante */
+  --muted: #cfcfcf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+}
+
+/* Preloader */
+#preloader {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+}
+.loader-logo {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 6px;
+}
+
+/* Seções base */
+.section {
+  position: relative;
+  min-height: 100vh;
+  padding: 64px 0;
+}
+.section .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+}
+.section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 12px 0;
+}
+.section-title.accent { color: var(--accent); }
+.section-subtitle {
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* Vídeo de fundo */
+.bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* HERO */
+.hero { padding: 0; }
+.hero-content {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.typing {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(36px, 8vw, 84px);
+  font-weight: 800;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+.cursor {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Portfólio */
+.portfolio .grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+.portfolio .card {
+  grid-column: span 6;
+  text-decoration: none;
+  color: inherit;
+  background: #0a0a0a;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #141414;
+}
+.portfolio .thumb img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.portfolio .meta {
+  padding: 12px 14px;
+}
+.portfolio .desc { font-weight: 600; }
+.portfolio .tags { color: var(--muted); font-size: 14px; }
+
+/* Sobre */
+.about .about-wrap {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 32px;
+  align-items: center;
+}
+.about .about-photo img {
+  border-radius: 12px;
+}
+
+/* Serviços */
+.services { overflow: hidden; }
+.services .media-bg, .testimonials .media-bg, .contact .media-bg {
+  position: absolute;
+  inset: 0;
+}
+.services .container, .testimonials .container, .contact .container {
+  position: relative;
+  z-index: 2;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.card.service, .card.testimonial {
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #1b1b1b;
+  border-radius: 12px;
+  padding: 18px;
+  backdrop-filter: blur(2px);
+}
+.service .icon { font-size: 28px; }
+
+/* Depoimentos */
+.testimonials-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.testimonial p { font-style: italic; }
+.client { color: var(--muted); font-size: 14px; }
+
+/* Contato */
+.contact-email {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.socials { display: flex; gap: 12px; }
+.social {
+  color: var(--text);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid #1b1b1b;
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+}
+.social:hover { color: var(--accent); }
+
+/* Rodapé */
+.footer {
+  background: #050505;
+  border-top: 1px solid #111;
+  padding: 18px 0;
+}
+.footer .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.portfolio-link { color: var(--muted); }
+.portfolio-link:hover { color: var(--accent); }
+
+/* Animações de entrada */
+[data-animate] { opacity: 0; transform: translateY(16px); }
+.appear { opacity: 1 !important; transform: translateY(0) !important; transition: opacity .6s ease, transform .6s ease; }
+
+/* Parallax */
+[data-parallax] { will-change: transform; }
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .portfolio .card { grid-column: span 12; }
+  .about .about-wrap { grid-template-columns: 1fr; }
+  .cards, .testimonials-grid { grid-template-columns: 1fr; }
+  .portfolio .thumb img { height: 200px; }
+}
