@@ -4,42 +4,41 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => preloader?.classList.add('hide'), 600);
   setTimeout(() => preloader?.remove(), 1200);
 
-  // Detectar e ativar vídeos locais se existirem
+  // Detectar e ativar vídeos locais (prioriza WebM, depois MP4, com remoto como fallback)
   function prepareLocalVideos() {
     const videos = document.querySelectorAll('video.bg-video');
     videos.forEach((video) => {
-      const localSrc = video.dataset.localSrc;
+      const localMp4 = video.dataset.localSrc;
+      const localWebm = video.dataset.localWebm;
       const localPoster = video.dataset.localPoster;
-      if (!localSrc) return;
 
-      // Tenta usar diretamente o arquivo local; se falhar, reverte para remoto
-      let source = video.querySelector('source');
-      if (!source) {
-        source = document.createElement('source');
-        video.appendChild(source);
-      }
-
-      const remoteSrc = source.src;
-      const remotePoster = video.poster;
-
-      source.src = localSrc;
-      if (!source.type) source.type = 'video/mp4';
       if (localPoster) video.poster = localPoster;
 
-      const onError = () => {
-        source.src = remoteSrc;
-        video.poster = remotePoster;
-        video.load();
-        video.removeEventListener('error', onError);
-        video.removeEventListener('loadeddata', onLoaded);
-      };
-      const onLoaded = () => {
-        // Local carregado com sucesso, remove handlers
-        video.removeEventListener('error', onError);
-        video.removeEventListener('loadeddata', onLoaded);
-      };
-      video.addEventListener('error', onError, { once: true });
-      video.addEventListener('loadeddata', onLoaded, { once: true });
+      const existingSources = Array.from(video.querySelectorAll('source'));
+      const newSources = [];
+
+      // Prioridade: WebM -> MP4
+      if (localWebm) newSources.push({ src: localWebm, type: 'video/webm' });
+      if (localMp4) newSources.push({ src: localMp4, type: 'video/mp4' });
+
+      // Fallback remoto (apenas se existir)
+      if (existingSources.length) {
+        const s0 = existingSources[0];
+        newSources.push({ src: s0.src, type: s0.type || '' });
+      }
+
+      if (!newSources.length) return; // nada a fazer
+
+      // Substitui fontes de uma vez para evitar múltiplos aborts
+      existingSources.forEach((s) => s.remove());
+      newSources.forEach(({ src, type }) => {
+        const s = document.createElement('source');
+        s.src = src;
+        if (type) s.type = type;
+        video.appendChild(s);
+      });
+
+      // Um único load para aplicar nova ordem
       video.load();
     });
   }

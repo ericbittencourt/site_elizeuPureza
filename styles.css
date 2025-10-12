@@ -56,6 +56,15 @@ img, video {
   background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.6));
   z-index: 1; /* overlay acima do vídeo fixo */
 }
+
+/* Garantir que o overlay do HERO cubra todo o viewport acima do vídeo fixo */
+.hero .overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 .section-title {
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
@@ -203,6 +212,26 @@ img, video {
   0% { transform: translate(-50%, 0); opacity: 1; }
   80% { transform: translate(-50%, 16px); opacity: 0.2; }
   100% { transform: translate(-50%, 16px); opacity: 0; }
+}
+
+/* Ajustes mobile: subir um pouco o subtítulo e o indicador de scroll */
+@media (max-width: 640px) {
+  .hero-subtitle {
+    margin-top: -20px; /* mesma alteração da web: separar mais a frase */
+  }
+  .scroll-indicator {
+    bottom: 24px; /* restaura posição original do mouse no mobile */
+  }
+}
+
+/* Versão web (desktop): aplicar a mesma subida de posição */
+@media (min-width: 641px) {
+  .hero-subtitle {
+    margin-top: -20px; /* solicitado: -20 no desktop */
+  }
+  .scroll-indicator {
+    bottom: 24px; /* restaura posição original do mouse no desktop */
+  }
 }
 
 /* Portfólio */
