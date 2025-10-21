@@ -38,48 +38,7 @@
       <div class="container">
         <h2 class="section-title accent" data-animate>PORTFÓLIO</h2>
         <p class="section-subtitle" data-animate>Alguns trabalhos que refletem meu olhar</p>
-        <div class="grid" data-animate>
-          <!-- Item exemplo 1 (vídeo) -->
-          <a class="card" href="#" title="Publicidade — Cliente X">
-            <div class="thumb">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Crect width='100%25' height='100%25' fill='%23999'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial'%3EImagem%3C/text%3E%3C/svg%3E" alt="Publicidade" />
-            </div>
-            <div class="meta">
-              <span class="desc">Publicidade — Cliente X</span>
-              <span class="tags">#Filmagem #Drone</span>
-            </div>
-          </a>
-          <!-- Item exemplo 2 (foto) -->
-          <a class="card" href="#" title="Retrato — Estúdio">
-            <div class="thumb">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Crect width='100%25' height='100%25' fill='%23999'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial'%3EImagem%3C/text%3E%3C/svg%3E" alt="Retrato" />
-            </div>
-            <div class="meta">
-              <span class="desc">Retrato — Estúdio</span>
-              <span class="tags">#Retrato</span>
-            </div>
-          </a>
-          <!-- Item exemplo 3 -->
-          <a class="card" href="#" title="Documental — Feira Local">
-            <div class="thumb">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Crect width='100%25' height='100%25' fill='%23999'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial'%3EImagem%3C/text%3E%3C/svg%3E" alt="Documental" />
-            </div>
-            <div class="meta">
-              <span class="desc">Documental — Feira Local</span>
-              <span class="tags">#Documental</span>
-            </div>
-          </a>
-          <!-- Item exemplo 4 -->
-          <a class="card" href="#" title="Eventos — Casamento">
-            <div class="thumb">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Crect width='100%25' height='100%25' fill='%23999'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-size='48' font-family='Arial'%3EImagem%3C/text%3E%3C/svg%3E" alt="Eventos" />
-            </div>
-            <div class="meta">
-              <span class="desc">Eventos — Casamento</span>
-              <span class="tags">#Eventos #Foto</span>
-            </div>
-          </a>
-        </div>
+        <div id="portfolio-grid" class="grid" data-animate></div>
       </div>
     </section>
 
@@ -203,6 +162,86 @@
         <small>© 2025 Elizeu Pureza</small>
       </div>
     </footer>
+
+    <!-- ADMIN -->
+    <section id="admin" class="section admin" hidden>
+      <div class="container">
+        <h2 class="section-title accent">Área Administrativa</h2>
+        <p class="section-subtitle">Acesso restrito.</p>
+
+        <!-- Login -->
+        <div id="admin-login" class="admin-card">
+          <form id="admin-login-form" class="admin-form" autocomplete="off">
+            <div class="form-row">
+              <label for="admin-user">Usuário</label>
+              <input id="admin-user" name="user" type="text" placeholder="Usuário" required />
+            </div>
+            <div class="form-row">
+              <label for="admin-pass">Senha</label>
+              <input id="admin-pass" name="pass" type="password" placeholder="Senha" minlength="8" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+            <p id="admin-error" class="form-error" role="alert" aria-live="polite" hidden>Usuário ou senha inválidos.</p>
+          </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="admin-dashboard" class="admin-card" hidden>
+          <div class="admin-head">
+            <h3>Bem-vindo, <span id="admin-name"></span></h3>
+            <button id="admin-logout" class="btn btn-secondary">Sair</button>
+          </div>
+          <div class="admin-grid">
+            <div class="admin-box">
+              <h4 class="admin-box-title">Status</h4>
+              <p>Sistema de login mockado ativo.</p>
+            </div>
+            <div class="admin-box">
+              <h4 class="admin-box-title">Gerenciar Portfólio</h4>
+              <div class="admin-content">
+                <form id="admin-add-form" class="admin-form">
+                  <div class="form-row">
+                    <label for="item-type">Tipo</label>
+                    <select id="item-type" name="type" required>
+                      <option value="image">Imagem</option>
+                      <option value="video">Vídeo</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <label for="item-title">Título</label>
+                    <input id="item-title" name="title" type="text" placeholder="Título do item" required />
+                  </div>
+                  <div class="form-row">
+                    <label for="item-url">URL</label>
+                    <input id="item-url" name="url" type="url" placeholder="https://... ou caminho relativo" required />
+                  </div>
+                  <div class="form-row">
+                    <label for="item-tags">Tags</label>
+                    <input id="item-tags" name="tags" type="text" placeholder="ex: #Retrato, #Drone" />
+                  </div>
+                  <input type="hidden" id="editing-id" />
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="save-item">Salvar</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-edit" hidden>Cancelar</button>
+                  </div>
+                </form>
+                <div class="admin-list-wrap">
+                  <h5 class="admin-box-title">Itens</h5>
+                  <div id="admin-items" class="admin-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-box">
+              <h4 class="admin-box-title">Ações</h4>
+              <ul>
+                <li>Importar exemplos</li>
+                <li>Backup/Restore</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <script src="script.js"></script>
   </body>
