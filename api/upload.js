@@ -1,11 +1,12 @@
+// Importações necessárias
 const { createClient } = require('@supabase/supabase-js');
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
 
 // Configuração do Supabase
-const SUPABASE_URL = 'https://znzkefmfgqzsvawtwyqb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuemtlZm1mZ3F6c3Zhd3R3eXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxNzY5NDEsImV4cCI6MjA3Nzc1Mjk0MX0.vI7B6yNoOxVVGVSg2HNqrvdB7BS40y5fx60gHNAZTeE';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://znzkefmfgqzsvawtwyqb.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuemtlZm1mZ3F6c3Zhd3R3eXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxNzY5NDEsImV4cCI6MjA3Nzc1Mjk0MX0.vI7B6yNoOxVVGVSg2HNqrvdB7BS40y5fx60gHNAZTeE';
 
 // Inicializa o cliente Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
