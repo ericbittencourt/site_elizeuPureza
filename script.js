@@ -207,8 +207,10 @@ window.addEventListener('scroll', updateParallax, { passive: true });
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const user = (document.getElementById('admin-user') || {}).value || '';
-        const pass = (document.getElementById('admin-pass') || {}).value || '';
+        const userInput = (document.getElementById('admin-user') || {}).value || '';
+        const passInput = (document.getElementById('admin-pass') || {}).value || '';
+        const user = userInput.trim().toLowerCase();
+        const pass = passInput.trim();
         const h = await sha256(`${user}:${pass}`);
         const ok = h === CRED_HASH;
         if (ok) {
@@ -220,6 +222,13 @@ window.addEventListener('scroll', updateParallax, { passive: true });
           if (error) error.hidden = false;
         }
       });
+
+      // Esconder mensagem de erro ao digitar novamente
+      const hideError = () => { if (error) error.hidden = true; };
+      const userEl = document.getElementById('admin-user');
+      const passEl = document.getElementById('admin-pass');
+      if (userEl) userEl.addEventListener('input', hideError);
+      if (passEl) passEl.addEventListener('input', hideError);
     }
 
     if (logoutBtn) {
@@ -259,155 +268,173 @@ window.addEventListener('scroll', updateParallax, { passive: true });
   }
   function saveItems(items) {
     localStorage.setItem(LS_KEY, JSON.stringify(items));
+    // também persistir no servidor
+    saveServer(items).catch(() => {});
   }
-  function uid() { return `${Date.now()}_${Math.random().toString(36).slice(2,8)}`; }
+  async function fetchServer(){
+    try {
+      // Usar Supabase em vez de API local
+      return await getPortfolioItems();
+    } catch (error) {
+      console.error('Erro ao buscar do Supabase:', error);
+      // Fallback para arquivo local se Supabase falhar
+      try {
+        const res2 = await fetch('/assets/portfolio.json', { cache: 'no-store' });
+        if (res2.ok) return await res2.json();
+      } catch {}
+      return null;
+    }
+  }
+  
+  async function saveServer(items){
+    try {
+      // Não precisamos mais salvar todos os itens de uma vez
+      // O Supabase gerencia cada item individualmente
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar no Supabase:', error);
+      return false;
+    }
+  }
+  async function syncFromServer(){
+    const serverItems = await fetchServer();
+    if (serverItems && Array.isArray(serverItems)) {
+      localStorage.setItem(LS_KEY, JSON.stringify(serverItems));
+      renderGrid();
+      renderAdmin();
+    }
+  }
 
-  function renderGrid() {
-    const el = grid();
+  function showBackendWarningIfNeeded(){
+    const el = document.getElementById('admin-backend-warning');
     if (!el) return;
-    const items = loadItems();
-    el.innerHTML = '';
-    if (!items.length) {
-      const empty = document.createElement('p');
-      empty.className = 'section-subtitle';
-      empty.textContent = 'Nenhum item no portfólio ainda.';
-      el.appendChild(empty);
-      return;
-    }
-    items.forEach((it) => {
+    fetch('/api/portfolio', { method: 'HEAD' })
+      .then(r => { if (!r.ok) throw new Error('no_api'); })
+      .catch(() => { el.hidden = false; });
+  }
+
+  function exportJson(){
+    const btn = document.getElementById('export-json');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const items = loadItems();
+      const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.className = 'card';
-      a.href = it.url || '#';
-      a.target = '_blank';
-      a.title = it.title || '';
+      a.href = url;
+      a.download = 'portfolio.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
 
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
-
-      if (it.type === 'video') {
-        const v = document.createElement('video');
-        v.src = it.url || '';
-        v.muted = true;
-        v.preload = 'metadata';
-        v.setAttribute('playsinline', '');
-        thumb.appendChild(v);
-      } else {
+  // Função para renderizar a grade de itens
+  function renderGrid() {
+    const items = loadItems();
+    const grid = document.getElementById('portfolio-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'portfolio-item';
+      card.dataset.id = item.id;
+      
+      const content = document.createElement('div');
+      content.className = 'portfolio-content';
+      
+      if (item.type === 'image') {
         const img = document.createElement('img');
-        img.src = it.url || '';
-        img.alt = it.title || 'Imagem';
-        thumb.appendChild(img);
+        img.src = item.url;
+        img.alt = item.title;
+        content.appendChild(img);
+      } else if (item.type === 'video') {
+        const video = document.createElement('video');
+        video.src = item.url;
+        video.muted = true;
+        video.loop = true;
+        video.autoplay = true;
+        content.appendChild(video);
       }
-
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const desc = document.createElement('span');
-      desc.className = 'desc';
-      desc.textContent = it.title || '';
-      const tags = document.createElement('span');
-      tags.className = 'tags';
-      tags.textContent = (it.tags || []).join(' ');
-
-      meta.appendChild(desc);
-      meta.appendChild(tags);
-      a.appendChild(thumb);
-      a.appendChild(meta);
-      el.appendChild(a);
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'portfolio-overlay';
+      
+      const title = document.createElement('h3');
+      title.textContent = item.title;
+      overlay.appendChild(title);
+      
+      const desc = document.createElement('p');
+      desc.textContent = item.description;
+      overlay.appendChild(desc);
+      
+      content.appendChild(overlay);
+      card.appendChild(content);
+      grid.appendChild(card);
     });
-  }
-
-  function renderAdmin() {
-    const listEl = adminList();
-    if (!listEl) return;
-    const items = loadItems();
-    listEl.innerHTML = '';
-    if (!items.length) {
-      const p = document.createElement('p');
-      p.className = 'hint';
-      p.textContent = 'Sem itens cadastrados.';
-      listEl.appendChild(p);
-      return;
-    }
-    items.forEach((it) => {
-      const row = document.createElement('div');
-      row.className = 'admin-item-row';
-      row.innerHTML = `
-        <div class="admin-item-main">
-          <strong>[${it.type}]</strong> ${it.title || ''}
-          <a href="${it.url}" target="_blank" class="admin-link">${it.url}</a>
-          <span class="admin-tags">${(it.tags||[]).join(' ')}</span>
-        </div>
-        <div class="admin-item-actions">
-          <button class="btn btn-secondary" data-action="edit">Editar</button>
-          <button class="btn btn-secondary" data-action="delete">Excluir</button>
-        </div>
-      `;
-      row.querySelector('[data-action="edit"]').addEventListener('click', () => startEdit(it.id));
-      row.querySelector('[data-action="delete"]').addEventListener('click', () => removeItem(it.id));
-      listEl.appendChild(row);
-    });
-  }
-
-  function startEdit(id) {
-    const items = loadItems();
-    const it = items.find((x) => x.id === id);
-    const form = addForm();
-    if (!it || !form) return;
-    form.type.value = it.type || 'image';
-    form.title.value = it.title || '';
-    form.url.value = it.url || '';
-    form.tags.value = (it.tags || []).join(', ');
-    editingIdInput().value = id;
-    cancelBtn().hidden = false;
-  }
-
-  function removeItem(id) {
-    const items = loadItems().filter((x) => x.id !== id);
-    saveItems(items);
-    renderGrid();
-    renderAdmin();
-  }
-
-  function upsertItem(data) {
-    const items = loadItems();
-    const editId = editingIdInput().value;
-    if (editId) {
-      const idx = items.findIndex((x) => x.id === editId);
-      if (idx >= 0) items[idx] = { ...items[idx], ...data };
-    } else {
-      items.push({ id: uid(), ...data });
-    }
-    saveItems(items);
-    renderGrid();
-    renderAdmin();
-  }
-
-  function initForm() {
-    const form = addForm();
-    if (!form) return;
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const type = form.type.value;
-      const title = form.title.value.trim();
-      const url = form.url.value.trim();
-      const tags = form.tags.value.split(',').map((t) => t.trim()).filter(Boolean);
-      upsertItem({ type, title, url, tags });
-      form.reset();
-      editingIdInput().value = '';
-      cancelBtn().hidden = true;
-    });
-    const c = cancelBtn();
-    if (c) {
-      c.addEventListener('click', () => {
-        form.reset();
-        editingIdInput().value = '';
-        c.hidden = true;
-      });
-    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    renderGrid();
-    renderAdmin();
-    initForm();
+    if (document.getElementById('portfolio-grid')) {
+      renderGrid();
+    }
+    if (document.getElementById('admin-form')) {
+      renderAdmin();
+      initForm();
+      syncFromServer();
+      exportJson();
+      showBackendWarningIfNeeded();
+    }
   });
 })();
+
+
+
+function fileInput() { return document.getElementById('item-file'); }
+
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadFile(file) {
+  try {
+    // Usar o Supabase Storage para upload
+    const url = await window.uploadFile(file);
+    if (url) return url;
+    throw new Error('upload_failed');
+  } catch (e) { 
+    console.error('Upload falhou', e); 
+    
+    // Fallback para o servidor local se o Supabase falhar
+    try {
+      const dataUrl = await fileToBase64(file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: file.name, data: dataUrl })
+      });
+      if (!res.ok) throw new Error('upload_failed');
+      const json = await res.json();
+      if (json && json.ok && json.url) return json.url;
+    } catch {}
+    
+    return null; 
+  }
+}
+
+
+function removeItem(id) {
+  const items = loadItems().filter((x) => x.id !== id);
+  localStorage.setItem(LS_KEY, JSON.stringify(items));
+  
+  // Excluir do Supabase
+  deletePortfolioItem(id).catch(err => console.error('Erro ao excluir do Supabase:', err));
+  
+  renderGrid();
+  renderAdmin();
+}

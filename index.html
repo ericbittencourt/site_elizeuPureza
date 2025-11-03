@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <!-- Pré-carregador -->
@@ -212,8 +214,13 @@
                     <input id="item-title" name="title" type="text" placeholder="Título do item" required />
                   </div>
                   <div class="form-row">
-                    <label for="item-url">URL</label>
-                    <input id="item-url" name="url" type="url" placeholder="https://... ou caminho relativo" required />
+                    <label for="item-url">URL (opcional)</label>
+                    <input id="item-url" name="url" type="url" placeholder="https://... ou caminho relativo" />
+                  </div>
+                  <div class="form-row">
+                    <label for="item-file">Arquivo (opcional)</label>
+                    <input id="item-file" name="file" type="file" accept="image/*,video/*" />
+                    <small class="hint">Use URL ou faça upload de um arquivo.</small>
                   </div>
                   <div class="form-row">
                     <label for="item-tags">Tags</label>
@@ -225,6 +232,10 @@
                     <button type="button" class="btn btn-secondary" id="cancel-edit" hidden>Cancelar</button>
                   </div>
                 </form>
+                <div class="admin-tools">
+                  <button id="export-json" class="btn btn-secondary">Exportar JSON</button>
+                  <p id="admin-backend-warning" class="hint" hidden>Upload e salvar no servidor exigem backend ativo. Em hospedagem estática, exporte o JSON e faça upload manual para <code>assets/portfolio.json</code>, e suba seus arquivos em <code>assets/</code>.</p>
+                </div>
                 <div class="admin-list-wrap">
                   <h5 class="admin-box-title">Itens</h5>
                   <div id="admin-items" class="admin-list"></div>
@@ -243,6 +254,7 @@
       </div>
     </section>
 
+    <script src="supabase.js"></script>
     <script src="script.js"></script>
   </body>
   </html>

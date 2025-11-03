@@ -1,0 +1,23 @@
+[
+  {
+    "id": "sample1",
+    "type": "video",
+    "title": "Vídeo Serviços",
+    "url": "/assets/servicos.mp4",
+    "tags": ["#demo"]
+  },
+  {
+    "id": "sample2",
+    "type": "video",
+    "title": "Vídeo Hero",
+    "url": "/assets/hero.webm",
+    "tags": ["#demo"]
+  },
+  {
+    "id": "sample3",
+    "type": "video",
+    "title": "Vídeo Contato",
+    "url": "/assets/contato.mp4",
+    "tags": ["#demo"]
+  }
+]
