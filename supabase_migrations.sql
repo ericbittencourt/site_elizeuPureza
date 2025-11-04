@@ -44,6 +44,7 @@ create policy if not exists "owner_update_portfolio" on public.portfolio
 -- Exclusão pelo dono autenticado
 create policy if not exists "owner_delete_portfolio" on public.portfolio
   for delete using (auth.uid() = user_id);
+  for delete using (auth.uid() = user_id);
 
 -- 3) Bucket de storage para mídias
 insert into storage.buckets (id, name, public)
