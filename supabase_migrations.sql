@@ -30,20 +30,23 @@ for each row execute function public.set_updated_at();
 alter table public.portfolio enable row level security;
 
 -- Leitura pública
-create policy if not exists "public_read_portfolio" on public.portfolio
+drop policy if exists "public_read_portfolio" on public.portfolio;
+create policy "public_read_portfolio" on public.portfolio
   for select using (true);
 
 -- Inserção pelo dono autenticado
-create policy if not exists "owner_insert_portfolio" on public.portfolio
+drop policy if exists "owner_insert_portfolio" on public.portfolio;
+create policy "owner_insert_portfolio" on public.portfolio
   for insert with check (auth.uid() = user_id);
 
 -- Atualização pelo dono autenticado
-create policy if not exists "owner_update_portfolio" on public.portfolio
+drop policy if exists "owner_update_portfolio" on public.portfolio;
+create policy "owner_update_portfolio" on public.portfolio
   for update using (auth.uid() = user_id);
 
 -- Exclusão pelo dono autenticado
-create policy if not exists "owner_delete_portfolio" on public.portfolio
-  for delete using (auth.uid() = user_id);
+drop policy if exists "owner_delete_portfolio" on public.portfolio;
+create policy "owner_delete_portfolio" on public.portfolio
   for delete using (auth.uid() = user_id);
 
 -- 3) Bucket de storage para mídias
@@ -53,18 +56,22 @@ on conflict (id) do nothing;
 
 -- Políticas do bucket 'media'
 -- Leitura pública de objetos do bucket
-create policy if not exists "public_read_media" on storage.objects
+drop policy if exists "public_read_media" on storage.objects;
+create policy "public_read_media" on storage.objects
   for select using (bucket_id = 'media');
 
 -- Upload apenas para usuários autenticados
-create policy if not exists "auth_insert_media" on storage.objects
+drop policy if exists "auth_insert_media" on storage.objects;
+create policy "auth_insert_media" on storage.objects
   for insert with check (bucket_id = 'media' and auth.uid() is not null);
 
 -- Atualização e exclusão apenas pelo dono
-create policy if not exists "owner_update_media" on storage.objects
+drop policy if exists "owner_update_media" on storage.objects;
+create policy "owner_update_media" on storage.objects
   for update using (bucket_id = 'media' and owner = auth.uid());
 
-create policy if not exists "owner_delete_media" on storage.objects
+drop policy if exists "owner_delete_media" on storage.objects;
+create policy "owner_delete_media" on storage.objects
   for delete using (bucket_id = 'media' and owner = auth.uid());
 
 -- Fim das migrações
