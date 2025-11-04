@@ -111,3 +111,34 @@ window.uploadFile = async function(file) {
   
   return publicURL?.publicUrl || null;
 }
+
+// -----------------------------
+// Autenticação (Supabase Auth)
+// -----------------------------
+window.login = async function(email, password) {
+  const client = createSupabaseClient();
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+window.logout = async function() {
+  const client = createSupabaseClient();
+  const { error } = await client.auth.signOut();
+  if (error) throw error;
+  return true;
+}
+
+window.getCurrentUser = async function() {
+  const client = createSupabaseClient();
+  const { data, error } = await client.auth.getUser();
+  if (error) return null;
+  return data?.user || null;
+}
+
+window.onAuthChange = function(callback) {
+  const client = createSupabaseClient();
+  client.auth.onAuthStateChange((event, session) => {
+    try { callback(event, session); } catch {}
+  });
+}

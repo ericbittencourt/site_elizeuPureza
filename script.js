@@ -165,6 +165,21 @@ window.addEventListener('scroll', updateParallax, { passive: true });
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
 
+  async function refreshAuthState() {
+    try {
+      const user = await window.getCurrentUser();
+      if (user) {
+        localStorage.setItem('adminAuth', 'true');
+        const nameEl = document.getElementById('admin-name');
+        if (nameEl) nameEl.textContent = user.email || (user.user_metadata && user.user_metadata.name) || 'admin';
+      } else {
+        localStorage.removeItem('adminAuth');
+      }
+    } catch {
+      localStorage.removeItem('adminAuth');
+    }
+  }
+
   async function sha256(str) {
     const enc = new TextEncoder().encode(str);
     const buf = await crypto.subtle.digest('SHA-256', enc);
@@ -207,18 +222,15 @@ window.addEventListener('scroll', updateParallax, { passive: true });
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const userInput = (document.getElementById('admin-user') || {}).value || '';
-        const passInput = (document.getElementById('admin-pass') || {}).value || '';
-        const user = userInput.trim().toLowerCase();
-        const pass = passInput.trim();
-        const h = await sha256(`${user}:${pass}`);
-        const ok = h === CRED_HASH;
-        if (ok) {
-          localStorage.setItem('adminAuth', 'true');
-          if (nameEl) nameEl.textContent = user;
+        const email = ((document.getElementById('admin-user') || {}).value || '').trim();
+        const password = ((document.getElementById('admin-pass') || {}).value || '').trim();
+        try {
+          await window.login(email, password);
+          await refreshAuthState();
           if (error) error.hidden = true;
           updateView();
-        } else {
+        } catch (err) {
+          console.error('Falha no login', err);
           if (error) error.hidden = false;
         }
       });
@@ -232,15 +244,25 @@ window.addEventListener('scroll', updateParallax, { passive: true });
     }
 
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
+      logoutBtn.addEventListener('click', async () => {
+        try { await window.logout(); } catch {}
         localStorage.removeItem('adminAuth');
         history.pushState({}, '', '/');
         updateView();
       });
     }
+
+    // Atualiza UI ao alterar o estado de autenticação
+    try {
+      window.onAuthChange(async () => {
+        await refreshAuthState();
+        updateView();
+      });
+    } catch {}
   }
 
-  function renderRoute() {
+  async function renderRoute() {
+    await refreshAuthState();
     updateView();
     initEvents();
   }
